@@ -1,260 +1,159 @@
 # YOLOv8 Classification Suite
 
-A production-grade, modular Python software suite for Image Classification using the YOLOv8 framework (Ultralytics).
+A production-grade, modular toolkit for image classification with YOLOv8 — now documented as an **interactive map** so you can jump straight to what you need.
 
-## Features
+> **Pick Your Path**
+> - **I want the fastest setup** → Jump to the [Quick Launch Lane](#quick-launch-lane)
+> - **I prefer the GUI experience** → Skip to the [GUI Flight Deck](#gui-flight-deck)
+> - **I work in the terminal** → Head to the [CLI Action Cards](#cli-action-cards)
+> - **I need the lay of the land** → Explore the [Repo Topography](#repo-topography)
 
-- **Professional GUI**: Modern, interactive PyQt6-based GUI with 8K/High DPI support
-- **Modular Architecture**: Clean separation of concerns with dedicated modules for training, inference, and export
-- **Production-Ready**: Proper logging, error handling, type hints, CLI and GUI interfaces
-- **Flexible Training**: Configurable training parameters with checkpointing and early stopping
-- **Real-Time Monitoring**: Live training progress, loss curves, and validation metrics in GUI
-- **Multiple Inference Modes**: Support for single images, image folders, videos, and live streams
-- **Interactive Preview**: Image preview with prediction overlays and detailed results
-- **Model Export**: Export to ONNX, TorchScript, CoreML, and other formats
-- **Automatic Device Detection**: Seamless CUDA/CPU handling
+## Why This Suite Stands Out
 
-## Directory Structure
+- **Professional GUI**: Modern PyQt6 interface with 8K/High DPI support.
+- **Modular Architecture**: Clear separation for training, inference, and export.
+- **Production Ready**: Logging, error handling, type hints, CLI + GUI entry points.
+- **Flexible Training**: Configurable hyperparameters with checkpointing and early stopping.
+- **Real-Time Monitoring**: Live metrics and previews while training or inferencing.
+- **Device-Aware**: Automatic CUDA/CPU selection and export to ONNX/TorchScript/CoreML.
 
-```
-SIC/
-├── src/
-│   ├── __init__.py          # Package initialization
-│   ├── trainer.py           # Training module
-│   ├── predictor.py         # Inference module
-│   └── exporter.py          # Model export module
-├── configs/
-│   └── config.yaml          # Configuration file
-├── main.py                  # Main entry point (CLI)
-├── gui_app.py               # Professional GUI application
-├── launch_gui.sh            # GUI launcher script
-├── requirements.txt         # Python dependencies
-└── README.md               # This file
-```
+## Quick Launch Lane
 
-## Installation
+Follow this abbreviated runway to get airborne fast. For a full play-by-play, see [QUICKSTART.md](QUICKSTART.md).
 
-1. Clone or navigate to the project directory:
-```bash
-cd /Users/abinrajbhaskarandevarajan/SIC
-```
+1. **Install**
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. **Check the controls**
+   ```bash
+   python main.py --help
+   ```
+3. **Train immediately**
+   ```bash
+   python main.py train --data ./data --epochs 50 --batch 16
+   ```
+4. **Test a single image**
+   ```bash
+   python main.py predict --model runs/classify/run/weights/best.pt --source image.jpg --save
+   ```
+5. **Export for deployment**
+   ```bash
+   python main.py export --model runs/classify/run/weights/best.pt --format onnx --output model.onnx --simplify
+   ```
 
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+## GUI Flight Deck
 
-## GUI Application
+Prefer point-and-click? Launch the PyQt6 experience and fly through training, inference, and export from a single cockpit. Detailed screenshots and tips live in [GUI_GUIDE.md](GUI_GUIDE.md).
 
-The suite includes a professional-grade GUI application with 8K/High DPI support:
+**Launch Options**
+- `python gui_app.py`
+- `./launch_gui.sh`
+- In Python: `from gui_app import main; main()`
 
-### Launch GUI:
-```bash
-python gui_app.py
-# or
-./launch_gui.sh
-```
+**Tabs at a Glance**
+- **Training**: Model picker, dataset browser, hyperparameter sliders, live logs, start/stop controls.
+- **Inference**: Load models, pick sources (image/folder/video/webcam), adjust confidence, see previews and ranked predictions.
+- **Export**: Choose ONNX/TorchScript/CoreML, toggle FP16 or ONNX simplification, and track progress.
 
-### GUI Features:
+## CLI Action Cards
 
-**Training Tab:**
-- Model selection (yolov8n-cls.pt through yolov8x-cls.pt)
-- Dataset path browser
-- Training parameter configuration (epochs, batch size, learning rate, etc.)
-- Real-time training progress with live updates
-- Training logs and status messages
-- Device selection (auto, CPU, CUDA)
+Mix and match these cards to build your own workflow.
 
-**Inference Tab:**
-- Model loading and selection
-- Multiple input sources (Image, Folder, Video, Webcam)
-- Interactive image preview
-- Confidence threshold slider
-- Detailed prediction results (Top-1 and Top-5)
-- Batch folder prediction with summary statistics
-
-**Export Tab:**
-- Model export to ONNX, TorchScript, CoreML
-- Export configuration (image size, FP16 quantization, simplification)
-- Export status and progress tracking
-
-## Dataset Structure for YOLOv8 Classification
-
-YOLOv8 Classification requires a **folder-based structure** where each class has its own subdirectory. The dataset should be organized as follows:
-
-```
-data/
-├── train/
-│   ├── class1/
-│   │   ├── image1.jpg
-│   │   ├── image2.jpg
-│   │   └── ...
-│   ├── class2/
-│   │   ├── image1.jpg
-│   │   ├── image2.jpg
-│   │   └── ...
-│   └── class3/
-│       ├── image1.jpg
-│       ├── image2.jpg
-│       └── ...
-├── val/
-│   ├── class1/
-│   │   ├── image1.jpg
-│   │   └── ...
-│   ├── class2/
-│   │   ├── image1.jpg
-│   │   └── ...
-│   └── class3/
-│       ├── image1.jpg
-│       └── ...
-└── test/                    # Optional
-    ├── class1/
-    │   └── ...
-    ├── class2/
-    │   └── ...
-    └── class3/
-        └── ...
-```
-
-### Key Points:
-
-1. **Root Directory**: Contains `train/` and `val/` (and optionally `test/`) folders
-2. **Class Folders**: Each class is a subdirectory within `train/` and `val/`
-3. **Class Names**: The folder names become the class labels (e.g., "cat", "dog", "bird")
-4. **Images**: All images for a class are placed directly in that class's folder
-5. **Supported Formats**: JPG, JPEG, PNG, BMP, TIFF, WEBP
-
-### Example:
-```
-data/
-├── train/
-│   ├── cat/
-│   │   ├── cat_001.jpg
-│   │   ├── cat_002.jpg
-│   │   └── cat_003.jpg
-│   ├── dog/
-│   │   ├── dog_001.jpg
-│   │   ├── dog_002.jpg
-│   │   └── dog_003.jpg
-│   └── bird/
-│       ├── bird_001.jpg
-│       ├── bird_002.jpg
-│       └── bird_003.jpg
-└── val/
-    ├── cat/
-    │   ├── cat_004.jpg
-    │   └── cat_005.jpg
-    ├── dog/
-    │   ├── dog_004.jpg
-    │   └── dog_005.jpg
-    └── bird/
-        ├── bird_004.jpg
-        └── bird_005.jpg
-```
-
-**Important**: The `data` path you provide to the training command should point to the directory containing `train/` and `val/` folders, NOT to the `train/` folder itself.
-
-## Usage
-
-### Training
-
-Train a YOLOv8 classification model:
+<details>
+<summary><strong>Train (baseline)</strong></summary>
 
 ```bash
 python main.py train --data ./data --epochs 100 --batch 16
 ```
 
-With custom configuration:
+Key options: `--model yolov8n-cls.pt` · `--imgsz 224` · `--device cuda|cpu` · `--project my_project` · `--name experiment_1`
+</details>
+
+<details>
+<summary><strong>Predict (single image)</strong></summary>
 
 ```bash
-python main.py train \
-    --data ./data \
-    --model yolov8n-cls.pt \
-    --epochs 100 \
-    --batch 16 \
-    --imgsz 224 \
-    --device cuda \
-    --project my_project \
-    --name experiment_1
+python main.py predict --model runs/classify/run/weights/best.pt --source image.jpg --save
 ```
+</details>
 
-### Inference
+<details>
+<summary><strong>Predict (folder)</strong></summary>
 
-**Single Image:**
 ```bash
-python main.py predict \
-    --model runs/classify/run/weights/best.pt \
-    --source image.jpg \
-    --save
+python main.py predict --model best.pt --source ./test_images --save --output ./predictions
 ```
+</details>
 
-**Image Folder:**
+<details>
+<summary><strong>Predict (video or stream)</strong></summary>
+
 ```bash
-python main.py predict \
-    --model best.pt \
-    --source ./test_images \
-    --save \
-    --output ./predictions
+python main.py predict --model best.pt --source video.mp4 --output output.mp4 --show
+python main.py predict --model best.pt --source 0 --show              # webcam
+python main.py predict --model best.pt --source rtsp://... --show     # RTSP
 ```
+</details>
 
-**Video File:**
+<details>
+<summary><strong>Export</strong></summary>
+
 ```bash
-python main.py predict \
-    --model best.pt \
-    --source video.mp4 \
-    --output output.mp4 \
-    --show
+python main.py export --model best.pt --format onnx --output model.onnx --imgsz 224 --simplify
+python main.py export --model best.pt --format torchscript --output model.pt
+python main.py export --model best.pt --format coreml --output model.mlmodel
+```
+</details>
+
+## Dataset Blueprint
+
+YOLOv8 classification expects a folder-per-class layout. Point your `--data` flag at the directory containing `train/` and `val/` (and optionally `test/`).
+
+```
+data/
+├── train/
+│   ├── class1/
+│   ├── class2/
+│   └── class3/
+├── val/
+│   ├── class1/
+│   ├── class2/
+│   └── class3/
+└── test/        # optional
 ```
 
-**Live Stream (Webcam):**
-```bash
-python main.py predict \
-    --model best.pt \
-    --source 0 \
-    --show
+**Tips**
+- Folder names become class labels.
+- Supported formats: JPG, JPEG, PNG, BMP, TIFF, WEBP.
+- Keep images directly inside each class folder (no nested subfolders).
+
+## Repo Topography
+
+For a guided tour of every directory and generated artifact, check [DIRECTORY_STRUCTURE.md](DIRECTORY_STRUCTURE.md). Quick map:
+
+```
+SIC/
+├── src/           # trainer.py, predictor.py, exporter.py
+├── configs/       # config.yaml (defaults)
+├── main.py        # CLI entry point
+├── gui_app.py     # GUI entry point
+└── launch_gui.sh  # shell launcher for the GUI
 ```
 
-**RTSP Stream:**
-```bash
-python main.py predict \
-    --model best.pt \
-    --source rtsp://192.168.1.100:554/stream \
-    --show
-```
+## Model Menu
 
-### Export
+Pick the YOLOv8 classification variant that matches your balance of speed and accuracy:
+- `yolov8n-cls.pt` — Nano (fastest)
+- `yolov8s-cls.pt` — Small
+- `yolov8m-cls.pt` — Medium
+- `yolov8l-cls.pt` — Large
+- `yolov8x-cls.pt` — Extra Large (most accurate)
 
-**Export to ONNX:**
-```bash
-python main.py export \
-    --model best.pt \
-    --format onnx \
-    --output model.onnx \
-    --imgsz 224 \
-    --simplify
-```
+## Configuration Snapshot
 
-**Export to TorchScript:**
-```bash
-python main.py export \
-    --model best.pt \
-    --format torchscript \
-    --output model.pt
-```
+Defaults live in `configs/config.yaml`; CLI flags always override. Example:
 
-**Export to CoreML:**
-```bash
-python main.py export \
-    --model best.pt \
-    --format coreml \
-    --output model.mlmodel
-```
-
-## Configuration File
-
-The `configs/config.yaml` file allows you to set default parameters. CLI arguments override config file values.
-
-Example configuration:
 ```yaml
 model:
   name: "yolov8n-cls.pt"
@@ -270,26 +169,18 @@ training:
   device: "auto"
 ```
 
-## Model Variants
+## Outputs at a Glance
 
-YOLOv8 Classification models:
-- `yolov8n-cls.pt` - Nano (smallest, fastest)
-- `yolov8s-cls.pt` - Small
-- `yolov8m-cls.pt` - Medium
-- `yolov8l-cls.pt` - Large
-- `yolov8x-cls.pt` - Extra Large (most accurate)
+Training writes into `runs/classify/` by project/run name:
 
-## Output Structure
-
-After training, outputs are saved in:
 ```
 runs/classify/
 └── run/
     ├── weights/
-    │   ├── best.pt          # Best model checkpoint
-    │   └── last.pt          # Last epoch checkpoint
-    ├── results.png          # Training curves
-    ├── confusion_matrix.png # Confusion matrix
+    │   ├── best.pt
+    │   └── last.pt
+    ├── results.png
+    ├── confusion_matrix.png
     └── ...
 ```
 
@@ -297,10 +188,9 @@ runs/classify/
 
 - Python 3.8+
 - PyTorch 2.0+
-- CUDA (optional, for GPU acceleration)
-- See `requirements.txt` for full list
+- CUDA (optional for GPU acceleration)
+- Full list in `requirements.txt`
 
-## License
+## Licensing
 
-This project is provided as-is for educational and production use.
-
+Provided as-is for educational and production use.

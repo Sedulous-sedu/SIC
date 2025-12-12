@@ -1,56 +1,59 @@
-# Directory Structure
+# Directory Structure (Choose Your Tour)
+
+Use this map like a museum guide: jump to the room you care about or skim the highlights.
+
+## Quick Postcard
 
 ```
 SIC/
-├── .gitignore                 # Git ignore file
-├── README.md                  # Project documentation
-├── DIRECTORY_STRUCTURE.md     # This file
-├── requirements.txt           # Python dependencies
-├── main.py                    # Main entry point (CLI)
+├── README.md                  # Interactive overview
+├── QUICKSTART.md              # 10-minute takeoff
+├── GUI_GUIDE.md               # Screens + tips for the GUI
+├── main.py                    # CLI entry point
+├── gui_app.py                 # GUI entry point
+├── launch_gui.sh              # GUI launcher
 ├── configs/
-│   └── config.yaml            # Configuration file
+│   └── config.yaml            # Default knobs
 └── src/
-    ├── __init__.py            # Package initialization
-    ├── trainer.py             # Training module
-    ├── predictor.py           # Inference module
-    └── exporter.py            # Model export module
+    ├── trainer.py             # Training logic
+    ├── predictor.py           # Inference logic
+    └── exporter.py            # Export logic
 ```
 
-## File Descriptions
+## Room-by-Room
 
-### Root Level
+- **Root Deck**
+  - `README.md` — orientation map with pick-your-path navigation.
+  - `QUICKSTART.md` — condensed setup and runnable snippets.
+  - `GUI_GUIDE.md` — how to fly the PyQt6 interface.
+  - `requirements.txt` — everything you need to install.
+  - `main.py` — CLI portal for train/predict/export.
+  - `gui_app.py` + `launch_gui.sh` — graphical portal and shell launcher.
 
-- **main.py**: Command-line interface entry point. Handles training, inference, and export commands.
-- **requirements.txt**: Python package dependencies for the project.
-- **README.md**: Comprehensive documentation including usage examples and dataset structure.
-- **.gitignore**: Git ignore patterns for Python projects and YOLOv8 outputs.
+- **configs/**
+  - `config.yaml` — baseline defaults for model, dataset, training, and export. CLI flags override these.
 
-### configs/
+- **src/**
+  - `trainer.py` — `ClassificationTrainer` orchestrates YOLOv8 classification training (callbacks, checkpoints, metrics).
+  - `predictor.py` — `ClassificationPredictor` handles images, folders, videos, and live streams.
+  - `exporter.py` — `ModelExporter` targets ONNX, TorchScript, CoreML, and more.
 
-- **config.yaml**: YAML configuration file with default settings for model, dataset, training, logging, and export parameters.
-
-### src/
-
-- **__init__.py**: Package initialization file with version and author information.
-- **trainer.py**: `ClassificationTrainer` class for training YOLOv8 classification models with callbacks and checkpointing.
-- **predictor.py**: `ClassificationPredictor` class for inference on images, folders, videos, and streams.
-- **exporter.py**: `ModelExporter` class for exporting models to ONNX, TorchScript, CoreML, and other formats.
-
-## Generated Directories (after running)
-
-After training or inference, the following directories will be created:
+## What Appears After You Run Things
 
 ```
-SIC/
-├── runs/
-│   └── classify/
-│       └── run/
-│           ├── weights/
-│           │   ├── best.pt
-│           │   └── last.pt
-│           ├── results.png
-│           └── confusion_matrix.png
-└── predictions/              # (if saving predictions)
-    └── pred_*.jpg
+runs/classify/
+└── <project>/<run>/
+    ├── weights/
+    │   ├── best.pt
+    │   └── last.pt
+    ├── results.png
+    ├── confusion_matrix.png
+    └── ...
+predictions/                # if you saved outputs during inference
 ```
 
+## Navigation Shortcuts
+
+- Want commands you can paste? → [CLI Action Cards](README.md#cli-action-cards)
+- Need dataset layout? → [Dataset Blueprint](README.md#dataset-blueprint)
+- Looking for GUI instructions? → [GUI Flight Deck](README.md#gui-flight-deck)
