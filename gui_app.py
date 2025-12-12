@@ -133,7 +133,33 @@ class TrainingTab(QWidget):
     def init_ui(self):
         """Initialize UI components."""
         layout = QVBoxLayout()
-        
+
+        # Immersive header for contextual cues
+        hero = QFrame()
+        hero.setStyleSheet("""
+            QFrame {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                           stop:0 #0d47a1, stop:1 #42a5f5);
+                border-radius: 10px;
+                padding: 12px;
+            }
+            QLabel { color: white; }
+        """)
+        hero_layout = QVBoxLayout()
+        hero_title = QLabel("Adaptive Training Cockpit")
+        hero_title_font = QFont()
+        hero_title_font.setPointSize(12)
+        hero_title_font.setBold(True)
+        hero_title.setFont(hero_title_font)
+        hero_subtitle = QLabel(
+            "Curate your classification journey with presets, checkpoints, and live telemetry."
+        )
+        hero_subtitle.setWordWrap(True)
+        hero_layout.addWidget(hero_title)
+        hero_layout.addWidget(hero_subtitle)
+        hero.setLayout(hero_layout)
+        layout.addWidget(hero)
+
         # Model Selection Group
         model_group = QGroupBox("Model Configuration")
         model_layout = QGridLayout()
@@ -170,50 +196,58 @@ class TrainingTab(QWidget):
         
         model_group.setLayout(model_layout)
         layout.addWidget(model_group)
-        
+
         # Training Parameters Group
         params_group = QGroupBox("Training Parameters")
         params_layout = QGridLayout()
-        
-        params_layout.addWidget(QLabel("Epochs:"), 0, 0)
+
+        params_layout.addWidget(QLabel("Preset Blueprint:"), 0, 0)
+        self.preset_combo = QComboBox()
+        self.preset_combo.addItems([
+            "Rapid Prototype", "Balanced Explorer", "High Fidelity"
+        ])
+        self.preset_combo.currentTextChanged.connect(self.apply_preset)
+        params_layout.addWidget(self.preset_combo, 0, 1, 1, 3)
+
+        params_layout.addWidget(QLabel("Epochs:"), 1, 0)
         self.epochs_spin = QSpinBox()
         self.epochs_spin.setRange(1, 10000)
         self.epochs_spin.setValue(100)
         params_layout.addWidget(self.epochs_spin, 0, 1)
-        
-        params_layout.addWidget(QLabel("Batch Size:"), 0, 2)
+
+        params_layout.addWidget(QLabel("Batch Size:"), 1, 2)
         self.batch_spin = QSpinBox()
         self.batch_spin.setRange(1, 256)
         self.batch_spin.setValue(16)
-        params_layout.addWidget(self.batch_spin, 0, 3)
-        
-        params_layout.addWidget(QLabel("Image Size:"), 1, 0)
+        params_layout.addWidget(self.batch_spin, 1, 3)
+
+        params_layout.addWidget(QLabel("Image Size:"), 2, 0)
         self.imgsz_spin = QSpinBox()
         self.imgsz_spin.setRange(32, 1024)
         self.imgsz_spin.setValue(224)
         self.imgsz_spin.setSingleStep(32)
-        params_layout.addWidget(self.imgsz_spin, 1, 1)
-        
-        params_layout.addWidget(QLabel("Workers:"), 1, 2)
+        params_layout.addWidget(self.imgsz_spin, 2, 1)
+
+        params_layout.addWidget(QLabel("Workers:"), 2, 2)
         self.workers_spin = QSpinBox()
         self.workers_spin.setRange(0, 32)
         self.workers_spin.setValue(8)
-        params_layout.addWidget(self.workers_spin, 1, 3)
-        
-        params_layout.addWidget(QLabel("Learning Rate:"), 2, 0)
+        params_layout.addWidget(self.workers_spin, 2, 3)
+
+        params_layout.addWidget(QLabel("Learning Rate:"), 3, 0)
         self.lr_spin = QDoubleSpinBox()
         self.lr_spin.setRange(0.0001, 1.0)
         self.lr_spin.setValue(0.001)
         self.lr_spin.setDecimals(4)
         self.lr_spin.setSingleStep(0.0001)
-        params_layout.addWidget(self.lr_spin, 2, 1)
-        
-        params_layout.addWidget(QLabel("Patience:"), 2, 2)
+        params_layout.addWidget(self.lr_spin, 3, 1)
+
+        params_layout.addWidget(QLabel("Patience:"), 3, 2)
         self.patience_spin = QSpinBox()
         self.patience_spin.setRange(1, 1000)
         self.patience_spin.setValue(50)
-        params_layout.addWidget(self.patience_spin, 2, 3)
-        
+        params_layout.addWidget(self.patience_spin, 3, 3)
+
         params_group.setLayout(params_layout)
         layout.addWidget(params_group)
         
@@ -295,8 +329,48 @@ class TrainingTab(QWidget):
         
         layout.addLayout(button_layout)
         layout.addStretch()
-        
+
         self.setLayout(layout)
+
+    def apply_preset(self, preset_name: str):
+        """Apply parameter presets to accelerate setup."""
+        presets = {
+            "Rapid Prototype": {
+                "epochs": 10,
+                "batch": 8,
+                "imgsz": 192,
+                "workers": 4,
+                "lr": 0.005,
+                "patience": 10,
+            },
+            "Balanced Explorer": {
+                "epochs": 60,
+                "batch": 16,
+                "imgsz": 224,
+                "workers": 8,
+                "lr": 0.001,
+                "patience": 30,
+            },
+            "High Fidelity": {
+                "epochs": 200,
+                "batch": 32,
+                "imgsz": 320,
+                "workers": 16,
+                "lr": 0.0005,
+                "patience": 80,
+            },
+        }
+
+        preset = presets.get(preset_name)
+        if not preset:
+            return
+
+        self.epochs_spin.setValue(preset["epochs"])
+        self.batch_spin.setValue(preset["batch"])
+        self.imgsz_spin.setValue(preset["imgsz"])
+        self.workers_spin.setValue(preset["workers"])
+        self.lr_spin.setValue(preset["lr"])
+        self.patience_spin.setValue(preset["patience"])
     
     def browse_dataset(self):
         """Browse for dataset directory."""
@@ -414,7 +488,33 @@ class InferenceTab(QWidget):
     def init_ui(self):
         """Initialize UI components."""
         layout = QVBoxLayout()
-        
+
+        # Non-linear navigation ribbon
+        inspo = QFrame()
+        inspo.setStyleSheet("""
+            QFrame {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                           stop:0 #1e3c72, stop:1 #2a5298);
+                border-radius: 10px;
+                padding: 10px;
+            }
+            QLabel { color: white; }
+        """)
+        inspo_layout = QHBoxLayout()
+        inspo_title = QLabel("Spotlight Navigator")
+        inspo_title_font = QFont()
+        inspo_title_font.setPointSize(11)
+        inspo_title_font.setBold(True)
+        inspo_title.setFont(inspo_title_font)
+        self.insight_label = QLabel(
+            "Choose a lane: single image, batch folder, motion clip, or live webcam."
+        )
+        self.insight_label.setWordWrap(True)
+        inspo_layout.addWidget(inspo_title)
+        inspo_layout.addWidget(self.insight_label)
+        inspo.setLayout(inspo_layout)
+        layout.addWidget(inspo)
+
         # Model Selection
         model_group = QGroupBox("Model Selection")
         model_layout = QHBoxLayout()
@@ -457,6 +557,22 @@ class InferenceTab(QWidget):
         self.conf_slider = QSlider(Qt.Orientation.Horizontal)
         self.conf_slider.setRange(0, 100)
         self.conf_slider.setValue(25)
+        self.conf_slider.setStyleSheet("""
+            QSlider::groove:horizontal {
+                border: 1px solid #999;
+                height: 10px;
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #00c6ff, stop:1 #0072ff);
+                border-radius: 5px;
+            }
+            QSlider::handle:horizontal {
+                background: white;
+                border: 2px solid #0072ff;
+                width: 18px;
+                margin: -5px 0;
+                border-radius: 9px;
+            }
+        """)
         self.conf_value_label = QLabel("0.25")
         self.conf_slider.valueChanged.connect(
             lambda v: self.conf_value_label.setText(f"{v/100:.2f}")
@@ -527,9 +643,18 @@ class InferenceTab(QWidget):
         
         self.setLayout(layout)
         self.on_source_type_changed("Image")
-    
+
     def on_source_type_changed(self, source_type: str):
         """Handle source type change."""
+        storylines = {
+            "Image": "Solo shot mode: drop in one frame to probe class confidence.",
+            "Folder": "Gallery sweep: map out a collection and surface dominant classes.",
+            "Video": "Motion read: scan clips to catch class shifts across time.",
+            "Webcam": "Live watch: stream your webcam for real-time classification."
+        }
+
+        self.insight_label.setText(storylines.get(source_type, ""))
+
         if source_type == "Webcam":
             self.source_path_edit.setPlaceholderText("Enter webcam index (0 for default)")
             self.source_browse_btn.setEnabled(False)
@@ -550,6 +675,9 @@ class InferenceTab(QWidget):
         )
         if file_path:
             self.model_path_edit.setText(file_path)
+            self.insight_label.setText(
+                "Model anchored. Jump straight to a source lane and press Run Prediction."
+            )
     
     def browse_source(self):
         """Browse for source file/folder."""
@@ -563,6 +691,9 @@ class InferenceTab(QWidget):
             if file_path:
                 self.source_path_edit.setText(file_path)
                 self.load_preview_image(file_path)
+                self.insight_label.setText(
+                    "Locked on a single frame. Tune the confidence slider to surface top classes."
+                )
         
         elif source_type == "Folder":
             directory = QFileDialog.getExistingDirectory(
@@ -570,6 +701,9 @@ class InferenceTab(QWidget):
             )
             if directory:
                 self.source_path_edit.setText(directory)
+                self.insight_label.setText(
+                    "Folder queued. Predictions will map distribution and class leaders."
+                )
         
         elif source_type == "Video":
             file_path, _ = QFileDialog.getOpenFileName(
@@ -578,6 +712,9 @@ class InferenceTab(QWidget):
             )
             if file_path:
                 self.source_path_edit.setText(file_path)
+                self.insight_label.setText(
+                    "Video selected. Expect temporal sweeps across frames when you run."
+                )
     
     def load_preview_image(self, image_path: str):
         """Load image for preview."""
@@ -895,16 +1032,23 @@ class MainWindow(QMainWindow):
         """Initialize main UI."""
         self.setWindowTitle("YOLOv8 Classification Suite - Professional GUI")
         self.setGeometry(100, 100, 1600, 1000)
-        
+
         # High DPI scaling is enabled by default in PyQt6
-        
+
         # Central widget with tabs
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
-        
+
         layout = QVBoxLayout()
         central_widget.setLayout(layout)
-        
+
+        main_splitter = QSplitter(Qt.Orientation.Horizontal)
+        main_splitter.setHandleWidth(2)
+
+        right_panel = QWidget()
+        right_layout = QVBoxLayout()
+        right_panel.setLayout(right_layout)
+
         # Title
         title_label = QLabel("YOLOv8 Classification Suite")
         title_font = QFont()
@@ -912,31 +1056,65 @@ class MainWindow(QMainWindow):
         title_font.setBold(True)
         title_label.setFont(title_font)
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(title_label)
-        
+        right_layout.addWidget(title_label)
+
         # Tab widget
         self.tabs = QTabWidget()
         self.tabs.setTabPosition(QTabWidget.TabPosition.North)
-        
+
         # Create tabs
         self.training_tab = TrainingTab()
         self.inference_tab = InferenceTab()
         self.export_tab = ExportTab()
-        
+
         self.tabs.addTab(self.training_tab, "Training")
         self.tabs.addTab(self.inference_tab, "Inference")
         self.tabs.addTab(self.export_tab, "Export")
-        
-        layout.addWidget(self.tabs)
-        
+
+        self.tabs.currentChanged.connect(self.update_nav_state)
+        right_layout.addWidget(self.tabs)
+
+        main_splitter.addWidget(right_panel)
+
+        self.nav_panel = self.build_navigation_panel()
+        main_splitter.insertWidget(0, self.nav_panel)
+        main_splitter.setStretchFactor(0, 0)
+        main_splitter.setStretchFactor(1, 1)
+
+        layout.addWidget(main_splitter)
+
         # Status bar
         self.statusBar().showMessage("Ready")
-    
+
     def apply_styles(self):
         """Apply professional styling."""
         self.setStyleSheet("""
             QMainWindow {
                 background-color: #f5f5f5;
+            }
+            QFrame#navPanel {
+                background-color: #0f172a;
+                color: #e2e8f0;
+                border-right: 1px solid #1f2937;
+            }
+            QFrame#navCard {
+                background: #111827;
+                border: 1px solid #1f2937;
+                border-radius: 10px;
+            }
+            QFrame#navCard[active="true"] {
+                border: 1px solid #38bdf8;
+                box-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
+            }
+            QPushButton#navButton {
+                background: #38bdf8;
+                color: #0b1726;
+                font-weight: bold;
+                padding: 8px 10px;
+                border-radius: 6px;
+            }
+            QPushButton#navButton:hover {
+                background: #7dd3fc;
             }
             QTabWidget::pane {
                 border: 1px solid #ddd;
@@ -990,6 +1168,119 @@ class MainWindow(QMainWindow):
                 color: #333;
             }
         """)
+
+    def build_navigation_panel(self) -> QWidget:
+        """Create immersive navigation panel for non-linear exploration."""
+        panel = QFrame()
+        panel.setObjectName("navPanel")
+        layout = QVBoxLayout()
+        panel.setLayout(layout)
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(12)
+
+        headline = QLabel("Immersive Image Classification Journey")
+        headline_font = QFont()
+        headline_font.setPointSize(12)
+        headline_font.setBold(True)
+        headline.setFont(headline_font)
+        headline.setStyleSheet("color: #e2e8f0;")
+        layout.addWidget(headline)
+
+        subhead = QLabel(
+            "Jump between training, inference, and export without losing context."
+        )
+        subhead.setStyleSheet("color: #cbd5e1;")
+        subhead.setWordWrap(True)
+        layout.addWidget(subhead)
+
+        self.nav_cards: Dict[str, QFrame] = {}
+        self.nav_cards["train"] = self.create_nav_card(
+            "Train & Curate",
+            "Shape your dataset, choose YOLOv8 flavors, and monitor telemetry.",
+            lambda: self.tabs.setCurrentWidget(self.training_tab),
+        )
+        layout.addWidget(self.nav_cards["train"])
+
+        self.nav_cards["inference"] = self.create_nav_card(
+            "Predict & Explore",
+            "Experiment with single shots, galleries, or live feeds to validate signal.",
+            lambda: self.tabs.setCurrentWidget(self.inference_tab),
+        )
+        layout.addWidget(self.nav_cards["inference"])
+
+        self.nav_cards["export"] = self.create_nav_card(
+            "Package & Ship",
+            "Export ONNX, TorchScript, or CoreML with tuned image sizes and precision.",
+            lambda: self.tabs.setCurrentWidget(self.export_tab),
+        )
+        layout.addWidget(self.nav_cards["export"])
+
+        quick_actions = QGroupBox("Quick Actions")
+        quick_layout = QVBoxLayout()
+        quick_actions.setLayout(quick_layout)
+
+        dataset_btn = QPushButton("Load Dataset & Train")
+        dataset_btn.setObjectName("navButton")
+        dataset_btn.clicked.connect(self.training_tab.browse_dataset)
+
+        predict_btn = QPushButton("Load Model & Predict")
+        predict_btn.setObjectName("navButton")
+        predict_btn.clicked.connect(self.inference_tab.browse_model)
+
+        export_btn = QPushButton("Load Model & Export")
+        export_btn.setObjectName("navButton")
+        export_btn.clicked.connect(self.export_tab.browse_model)
+
+        quick_layout.addWidget(dataset_btn)
+        quick_layout.addWidget(predict_btn)
+        quick_layout.addWidget(export_btn)
+
+        layout.addWidget(quick_actions)
+        layout.addStretch()
+
+        self.update_nav_state(0)
+        return panel
+
+    def create_nav_card(self, title: str, subtitle: str, action) -> QFrame:
+        """Create a navigation card with action button."""
+        card = QFrame()
+        card.setObjectName("navCard")
+        card_layout = QVBoxLayout()
+        card.setLayout(card_layout)
+
+        title_label = QLabel(title)
+        title_font = QFont()
+        title_font.setPointSize(11)
+        title_font.setBold(True)
+        title_label.setFont(title_font)
+        title_label.setStyleSheet("color: #e2e8f0;")
+
+        subtitle_label = QLabel(subtitle)
+        subtitle_label.setStyleSheet("color: #cbd5e1;")
+        subtitle_label.setWordWrap(True)
+
+        action_btn = QPushButton("Jump")
+        action_btn.setObjectName("navButton")
+        action_btn.clicked.connect(action)
+
+        card_layout.addWidget(title_label)
+        card_layout.addWidget(subtitle_label)
+        card_layout.addWidget(action_btn)
+
+        def handle_mouse(event):
+            action()
+
+        card.mousePressEvent = handle_mouse  # type: ignore[assignment]
+        return card
+
+    def update_nav_state(self, index: int):
+        """Highlight the current navigation card."""
+        mapping = {0: "train", 1: "inference", 2: "export"}
+        active_key = mapping.get(index, "train")
+        for key, card in self.nav_cards.items():
+            card.setProperty("active", key == active_key)
+            card.style().unpolish(card)
+            card.style().polish(card)
 
 
 def main():
